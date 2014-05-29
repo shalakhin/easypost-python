@@ -74,7 +74,10 @@ def convert_to_easypost_object(response, api_key):
             'Batch': Batch,
             'Event': Event,
             'Tracker': Tracker,
-            'PostageLabel': PostageLabel }
+            'PostageLabel': PostageLabel,
+            'PrintJob': PrintJob,
+            'Printer': Printer,
+  }
 
   prefixes = { 'adr': Address,
             'sf': ScanForm,
@@ -87,7 +90,10 @@ def convert_to_easypost_object(response, api_key):
             'rfnd': Refund,
             'batch': Batch,
             'trk': Tracker,
-            'pl': PostageLabel }
+            'pl': PostageLabel,
+            'printer': Printer,
+            'printjob': PrintJob,
+  }
 
   if isinstance(response, list):
     return [convert_to_easypost_object(i, api_key) for i in response]
@@ -680,15 +686,13 @@ class PostageLabel(AllResource, CreateResource):
 class Tracker(AllResource, CreateResource):
   pass
 
-class Printer(Resource, CreateResource):
+class Printer(AllResource, CreateResource):
 
     def get_jobs(self, **params):
         requestor = Requestor(self.api_key)
-        url = "%s/%s" % (self.instance_url(), "get_jobs")
+        url = "%s/%s" % (self.instance_url(), "jobs")
         response, api_key = requestor.request('get', url, params)
-        return [
-            PrintJob(api_key, **job) for job in response
-        ]
+        return [convert_to_easypost_object(job, api_key) for job in response]
 
 class PrintJob(AllResource):
     pass
