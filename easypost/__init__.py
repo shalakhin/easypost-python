@@ -1,7 +1,5 @@
 # imports
-import os
 import platform
-import sys
 import urllib
 import urlparse
 import time
@@ -19,6 +17,9 @@ try:
   import cStringIO as StringIO
 except ImportError:
   import StringIO
+
+# hush, pyflakes
+StringIO
 
 # use urlfetch as request_lib on google app engine, otherwise use requests
 request_lib = None
@@ -268,7 +269,7 @@ class Requestor(object):
       result = requests.request(method, abs_url, headers=headers, data=data, timeout=60, verify=False)
       http_body = result.content
       http_status = result.status_code
-    except Exception as e:
+    except Exception:
       raise Error("Unexpected error communicating with EasyPost. If this problem persists please let us know at contact@easypost.com.")
     return http_body, http_status
 
@@ -678,6 +679,19 @@ class PostageLabel(AllResource, CreateResource):
 
 class Tracker(AllResource, CreateResource):
   pass
+
+class Printer(Resource, CreateResource):
+
+    def get_jobs(self, **params):
+        requestor = Requestor(self.api_key)
+        url = "%s/%s" % (self.instance_url(), "get_jobs")
+        response, api_key = requestor.request('get', url, params)
+        return [
+            PrintJob(api_key, **job) for job in response
+        ]
+
+class PrintJob(AllResource):
+    pass
 
 class Event(Resource):
 
