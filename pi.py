@@ -8,7 +8,7 @@ import urllib2
 import easypost
 
 easypost.api_key = 'cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi'
-
+easypost.api_base = 'http://localhost:5000/v2'
 
 def process_job(job):
 
@@ -47,17 +47,19 @@ def print_zpl(file_path):
 
 
 if __name__ == '__main__':
-    printer = easypost.Printer()
+    printer = easypost.Printer.retrieve("printer_pPmkSEU3")
 
     try:
         while True:
+            print 'getting jobs'
             response = printer.get_jobs()
+            print response
 
-            print 'saw %d jobs...' % len(response['print_jobs'])
+            # print 'saw %d jobs...' % len(response['print_jobs'])
 
-            for job in response['print_jobs']:
-                result = process_job(job)
-                print 'job finished with %s' % result
+            # for job in response['print_jobs']:
+            result = process_job(response[0])
+            print 'job finished with %s' % result
 
             print 'sleeping 1 second...'
             time.sleep(5)

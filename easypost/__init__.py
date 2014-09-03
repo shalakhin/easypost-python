@@ -694,6 +694,12 @@ class Printer(AllResource, CreateResource):
         response, api_key = requestor.request('get', url, params)
         return [convert_to_easypost_object(job, api_key) for job in response]
 
+    def print_postage_label(self, **params):
+      requestor = Requestor(self.api_key)
+      url = "%s/%s" % (self.instance_url(), "print_postage_label")
+      response, api_key = requestor.request('post', url, params)
+      return convert_to_easypost_object(response, api_key)
+
 class PrintJob(AllResource):
     pass
 
